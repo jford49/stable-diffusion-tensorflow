@@ -145,6 +145,7 @@ class StableDiffusion:
     def add_noise(self, x , t ):
         batch_size,w,h = x.shape[0] , x.shape[1] , x.shape[2]
         noise = tf.random.normal((batch_size,w,h,4), dtype=self.dtype)
+        # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         sqrt_alpha_prod = _ALPHAS_CUMPROD[t] ** 0.5
         sqrt_one_minus_alpha_prod = (1 - _ALPHAS_CUMPROD[t]) ** 0.5
 
@@ -153,7 +154,7 @@ class StableDiffusion:
     def get_starting_parameters(self, timesteps, batch_size, seed,  input_image=None, input_img_noise_t=None):
         n_h = self.img_height // 8
         n_w = self.img_width // 8
-        alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]
+        alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
         if input_image is None:
             latent = tf.random.normal((batch_size, n_h, n_w, 4), seed=seed)
