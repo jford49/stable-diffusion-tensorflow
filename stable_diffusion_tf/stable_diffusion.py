@@ -49,6 +49,11 @@ class StableDiffusion:
         input_mask=None,
         input_image_strength=0.5,
     ):
+        singles = False
+        if batch_size == 0:
+            batch_size = 1
+            singles = True
+            
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
         assert len(inputs) < 77, "Prompt is too long (should be < 77 tokens)"
@@ -99,6 +104,7 @@ class StableDiffusion:
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
         # Diffusion stage
+        out_list = []
         progbar = tqdm(list(enumerate(timesteps))[::-1])
         for index, timestep in progbar:
             progbar.set_description(f"{index:3d} {timestep:3d}")
@@ -122,7 +128,18 @@ class StableDiffusion:
                     timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
                 )
                 latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
-
+            
+            if singles:
+                decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
+                out_list.append(decoded)
+                
+        if not singles:
+            decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
+            out_list.append(decoded)
+            
+        return out_list
+    
+    def decode_latent(self, latent, input_image_array=None, input_mask=None, input_mask_array=None):
         # Decoding stage
         decoded = self.decoder.predict_on_batch(latent)
         decoded = ((decoded + 1) / 2) * 255
