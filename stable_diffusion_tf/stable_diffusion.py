@@ -74,6 +74,7 @@ class StableDiffusion:
 
             input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
 
+        input_mask_array = None
         if type(input_mask) is str:
             input_mask = Image.open(input_mask)
             input_mask = input_mask.resize((self.img_width, self.img_height))
