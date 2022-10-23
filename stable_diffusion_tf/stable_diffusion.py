@@ -67,6 +67,7 @@ class StableDiffusion:
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         
         input_image_tensor = None
+        input_image_array = None
         if type(input_image) is str:
             input_image = Image.open(input_image)
             input_image = input_image.resize((self.img_width, self.img_height))
