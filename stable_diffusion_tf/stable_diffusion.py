@@ -89,10 +89,11 @@ class StableDiffusion:
             latent_mask = 1 - (latent_mask.astype("float") / 255.0)
             print("latent_mask shape", latent_mask.shape)
             latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
+            latent_mask_tensor = self.encoder(latent_mask)
             print("latent_mask_tensor shape", latent_mask_tensor.shape)
 
 
-        # Encode unconditional tokens (and their positions into an
+        # Encode unconditional tokens (and their positions) into an
         # "unconditional context vector"
         unconditional_tokens = np.array(_UNCONDITIONAL_TOKENS)[None].astype("int32")
         unconditional_tokens = np.repeat(unconditional_tokens, batch_size, axis=0)
