@@ -85,8 +85,9 @@ class StableDiffusion:
             latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
             latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
             latent_mask = 1 - (latent_mask.astype("float") / 255.0)
+            print("latent_mask shape", latent_mask.shape)
             latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
-            print("latent mask tensor", latent_mask_tensor.shape)
+            print("latent_mask_tensor shape", latent_mask_tensor.shape)
 
 
         # Encode unconditional tokens (and their positions into an
@@ -133,7 +134,7 @@ class StableDiffusion:
                     timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
                 )
                 
-                print("latent_orgin", latent_orgin.shape)
+                print("latent_orgin shape", latent_orgin.shape)
                 latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
             
             if singles:
