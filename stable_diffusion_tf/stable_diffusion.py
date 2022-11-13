@@ -187,7 +187,9 @@ class StableDiffusion:
             latent = tf.random.normal((batch_size, n_h, n_w, 4), seed=seed)
         else:
             latent = self.encoder(input_image)
+            print("latent encode shape", latent.shape)
             latent = tf.repeat(latent , batch_size , axis=0)
+            print("latent batch_size shape", latent.shape)
             latent = self.add_noise(latent, input_img_noise_t)
         return latent, alphas, alphas_prev
 
