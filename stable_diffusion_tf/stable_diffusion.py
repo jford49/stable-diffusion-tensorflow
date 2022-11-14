@@ -36,7 +36,14 @@ class StableDiffusion:
         self.dtype = tf.float32
         if tf.keras.mixed_precision.global_policy().name == 'mixed_float16':
             self.dtype = tf.float16
-
+            
+    def encode(input_image):
+        return self.encoder(input_image)
+    
+    def decode(encoded):
+        decoded = self.decoder.predict_on_batch(latent)
+        return ((decoded + 1) / 2) * 255
+    
     def generate(
         self,
         prompt,
@@ -131,6 +138,7 @@ class StableDiffusion:
             )
 
             latent_orgin = None
+            mix = None
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
                 # The intermediate latent will be merged with input latent.
@@ -152,7 +160,6 @@ class StableDiffusion:
                 
                 mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
                 mix = np.clip(mix, 0, 255).astype("uint8")
-                latent = self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask, input_mask_array)
