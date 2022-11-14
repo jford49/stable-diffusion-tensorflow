@@ -143,7 +143,7 @@ class StableDiffusion:
                 latent_decoded = ((latent_decoded + 1) / 2) * 255
                 latent_decoded = np.clip(latent_decoded, 0, 255).astype("uint8")
                 
-                latent_orgin_decoded = self.decoder.predict_on_batch(latent_origin)
+                latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
                 latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
                 
