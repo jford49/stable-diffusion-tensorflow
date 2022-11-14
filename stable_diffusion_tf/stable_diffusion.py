@@ -136,8 +136,20 @@ class StableDiffusion:
                     timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
                 )
                 
-                print("latent_orgin shape", latent_orgin.shape)
-                latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
+                #print("latent_orgin shape", latent_orgin.shape)
+                #latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
+                
+                latent_decoded = self.decoder.predict_on_batch(latent)
+                latent_decoded = ((latent_decoded + 1) / 2) * 255
+                latent_decoded = np.clip(latent_decoded, 0, 255).astype("uint8")
+                
+                latent_orgin_decoded = self.decoder.predict_on_batch(latent_origin)
+                latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
+                latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
+                
+                mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
+                mix = np.clip(latent_decoded, 0, 255).astype("uint8")
+                latent = self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
@@ -187,9 +199,9 @@ class StableDiffusion:
             latent = tf.random.normal((batch_size, n_h, n_w, 4), seed=seed)
         else:
             latent = self.encoder(input_image)
-            print("latent encode shape", latent.shape)
+            #print("latent after encode shape", latent.shape)
             latent = tf.repeat(latent , batch_size , axis=0)
-            print("latent batch_size shape", latent.shape)
+            #print("latent after batch_size shape", latent.shape)
             latent = self.add_noise(latent, input_img_noise_t)
         return latent, alphas, alphas_prev
 
