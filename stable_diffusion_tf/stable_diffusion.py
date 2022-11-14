@@ -83,6 +83,7 @@ class StableDiffusion:
             input_mask = input_mask.resize((self.img_width, self.img_height))
             input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,None]
             input_mask_array =  input_mask_array / 255.0
+            print("input_mask_array shape", input_mask_array.shape)
             
             latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
             latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
@@ -146,6 +147,7 @@ class StableDiffusion:
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
                 latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
+                print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
                 
                 mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
                 mix = np.clip(latent_decoded, 0, 255).astype("uint8")
