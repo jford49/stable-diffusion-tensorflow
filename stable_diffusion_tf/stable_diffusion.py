@@ -130,6 +130,7 @@ class StableDiffusion:
                 latent, e_t, index, a_t, a_prev, temperature, seed
             )
 
+            latent_orgin = None)
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
                 # The intermediate latent will be merged with input latent.
@@ -154,7 +155,9 @@ class StableDiffusion:
                 latent = self.encoder(mix)
             
             if singles:
-                decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
+                decoded = self.decode_latent(latent)#, input_image_array, input_mask, input_mask_array)
+                out_list.append(decoded)
+                decoded = self.decode_latent(latent_orgin)
                 out_list.append(decoded)
                 
         if not singles:
