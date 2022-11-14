@@ -84,11 +84,6 @@ class StableDiffusion:
             input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,None]
             input_mask_array =  input_mask_array / 255.0
             
-            input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,:3]
-            print("input_mask_array shape", input_mask_array.shape)
-
-            input_mask_tensor = tf.cast((input_mask_array / 255.0) * 2 - 1, self.dtype)
-            
             latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
             latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
             latent_mask = 1 - (latent_mask.astype("float") / 255.0)
