@@ -147,10 +147,10 @@ class StableDiffusion:
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
                 latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
-                print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
+                #print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
                 
                 mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
-                mix = np.clip(latent_decoded, 0, 255).astype("uint8")
+                mix = np.clip(mix, 0, 255).astype("uint8")
                 latent = self.encoder(mix)
             
             if singles:
