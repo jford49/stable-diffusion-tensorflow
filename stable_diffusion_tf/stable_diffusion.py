@@ -81,7 +81,7 @@ class StableDiffusion:
         if type(input_mask) is str:
             input_mask = Image.open(input_mask)
             input_mask = input_mask.resize((self.img_width, self.img_height))
-            input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,None]
+            input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,:3]
             input_mask_array =  input_mask_array / 255.0
             print("input_mask_array shape", input_mask_array.shape)
             
