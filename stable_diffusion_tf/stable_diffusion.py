@@ -37,10 +37,10 @@ class StableDiffusion:
         if tf.keras.mixed_precision.global_policy().name == 'mixed_float16':
             self.dtype = tf.float16
             
-    def encode(input_image):
+    def encode(self, input_image):
         return self.encoder(input_image)
     
-    def decode(encoded):
+    def decode(self, encoded):
         decoded = self.decoder.predict_on_batch(encoded)
         return ((decoded + 1) / 2) * 255
     
