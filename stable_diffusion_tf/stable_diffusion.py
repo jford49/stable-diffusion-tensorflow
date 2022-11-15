@@ -41,7 +41,7 @@ class StableDiffusion:
         return self.encoder(input_image)
     
     def decode(encoded):
-        decoded = self.decoder.predict_on_batch(latent)
+        decoded = self.decoder.predict_on_batch(encoded)
         return ((decoded + 1) / 2) * 255
     
     def generate(
