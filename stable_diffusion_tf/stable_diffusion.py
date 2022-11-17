@@ -162,7 +162,7 @@ class StableDiffusion:
                 #mix = np.clip(mix, 0, 255).astype("uint8")
             
             if singles:
-                decoded = self.decode_latent(latent), input_image_array, input_mask, input_mask_array)
+                decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
                 out_list.append(decoded)
                 decoded = self.decode_latent(latent_orgin, input_image_array, input_mask, input_mask_array))
                 out_list.append(decoded)
