@@ -158,8 +158,8 @@ class StableDiffusion:
                 latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
                 #print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
                 
-                mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
-                mix = np.clip(mix, 0, 255).astype("uint8")
+                latent = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
+                #mix = np.clip(mix, 0, 255).astype("uint8")
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask, input_mask_array)
