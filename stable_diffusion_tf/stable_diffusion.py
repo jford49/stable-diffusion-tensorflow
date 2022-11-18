@@ -108,6 +108,7 @@ class StableDiffusion:
         unconditional_context = self.text_encoder.predict_on_batch(
             [self.unconditional_tokens, pos_ids]
         )
+        
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
@@ -132,7 +133,9 @@ class StableDiffusion:
                 unconditional_guidance_scale,
                 batch_size,
             )
+            
             a_t, a_prev = alphas[index], alphas_prev[index]
+            
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
                 latent, e_t, index, a_t, a_prev, temperature, seed
             )
@@ -150,35 +153,38 @@ class StableDiffusion:
                 #latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
                 
                 latent_decoded = self.decoder.predict_on_batch(latent)
-                latent_decoded = ((latent_decoded + 1) / 2) * 255
-                latent_decoded = np.clip(latent_decoded, 0, 255).astype("uint8")
+                #latent_decoded = ((latent_decoded + 1) / 2) * 255
+                #latent_decoded = np.clip(latent_decoded, 0, 255).astype("uint8")
                 
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
-                latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
-                latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
+                #latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
+                #latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
                 #print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
                 
                 mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
-                #mix = np.clip(mix, 0, 255).astype("uint8")
+                latent_mix =  self.encoder(mix)
             
             if singles:
-                decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
+                decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
                 out_list.append(decoded)
-                decoded = self.decode_latent(latent_orgin, input_image_array, input_mask, input_mask_array)
+                decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
                 out_list.append(decoded)
+                if mix is not None:
+                    decoded = self.decode_latent(mix)
+                    out_list.append(decoded)
                 
         if not singles:
-            decoded = self.decode_latent(latent, input_image_array, input_mask, input_mask_array)
+            decoded = self.decode_latent(latent, input_image_array, input_mask_array)
             return decoded
         else:
             return out_list
     
-    def decode_latent(self, latent, input_image_array=None, input_mask=None, input_mask_array=None):
+    def decode_latent(self, latent, input_image_array=None, input_mask_array=None):
         # Decoding stage
         decoded = self.decoder.predict_on_batch(latent)
         decoded = ((decoded + 1) / 2) * 255
 
-        if input_mask is not None:
+        if (input_image_array is not None) and (input_mask_array is not None):
           # Merge inpainting output with original image
           decoded = input_image_array * (1-input_mask_array) + np.array(decoded) * input_mask_array
 
@@ -210,6 +216,7 @@ class StableDiffusion:
         if input_image is None:
             latent = tf.random.normal((batch_size, n_h, n_w, 4), seed=seed)
         else:
+            # input_image is -1 to 1
             latent = self.encoder(input_image)
             #print("latent after encode shape", latent.shape)
             latent = tf.repeat(latent , batch_size , axis=0)
