@@ -153,13 +153,7 @@ class StableDiffusion:
                 #latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
                 
                 latent_decoded = self.decoder.predict_on_batch(latent)
-                #latent_decoded = ((latent_decoded + 1) / 2) * 255
-                #latent_decoded = np.clip(latent_decoded, 0, 255).astype("uint8")
-                
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
-                #latent_orgin_decoded = ((latent_orgin_decoded + 1) / 2) * 255            
-                #latent_orgin_decoded = np.clip(latent_orgin_decoded, 0, 255).astype("uint8")
-                #print("latent_orgin_decoded shape", latent_orgin_decoded.shape)
                 
                 mix = latent_orgin_decoded * input_mask_array + latent_decoded * (1- input_mask_array)
                 latent_mix =  self.encoder(mix)
@@ -191,7 +185,7 @@ class StableDiffusion:
           # Merge inpainting output with original image
           decoded = input_image_array * (1-input_mask_array) + np.array(decoded) * input_mask_array
 
-        return np.clip(decoded, 0, 255).astype("uint8")
+        return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
 
     def timestep_embedding(self, timesteps, dim=320, max_period=10000):
         half = dim // 2
