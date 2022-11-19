@@ -167,7 +167,7 @@ class StableDiffusion:
                     
                 if mix is not None:
                     mix = ((mix + 1) / 2) * 255            
-                    mix = np.clip(mix, 0, 255).astype("uint8")
+                    mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
                     out_list.append((mix, "mix"))
                 
         if not singles:
