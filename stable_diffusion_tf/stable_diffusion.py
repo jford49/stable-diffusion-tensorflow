@@ -178,7 +178,7 @@ class StableDiffusion:
                 
         if not singles:
             decoded = self.decode_latent(latent, input_image_array, input_mask_array)
-            return (decoded, "")
+            return [(decoded, "")]
         else:
             return out_list
     
