@@ -151,12 +151,12 @@ class StableDiffusion:
                 )
                 
                 #print("latent_orgin shape", latent_orgin.shape)
-                #latent = latent_orgin * latent_mask_tensor + latent * (1- latent_mask_tensor)
+                #latent = latent_orgin * latent_mask_tensor + latent * (1 - latent_mask_tensor)
                 
                 latent_decoded = self.decoder.predict_on_batch(latent)
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
-                mix = latent_orgin_decoded * (1- input_mask_array) + latent_decoded * (input_mask_array)
+                mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
                 latent_mix =  self.encoder(mix)
             
             if singles:
