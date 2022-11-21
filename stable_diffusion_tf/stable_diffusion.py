@@ -255,12 +255,11 @@ class StableDiffusion:
         )
 
     def get_x_prev_and_pred_x0(self, x, e_t, index, a_t, a_prev):#, temperature, seed):
-        #sigma_t = 0
         sqrt_one_minus_at = math.sqrt(1 - a_t)
         pred_x0 = (x - sqrt_one_minus_at * e_t) / math.sqrt(a_t)
 
-        # Direction pointing to x_t
-        dir_xt = math.sqrt(1.0 - a_prev - sigma_t**2) * e_t
+        sigma_t = 0
+        dir_xt = math.sqrt(1.0 - a_prev - sigma_t**2) * e_t # Direction pointing to x_t
         #noise = sigma_t * tf.random.normal(x.shape, seed=seed) * temperature
         x_prev = math.sqrt(a_prev) * pred_x0 + dir_xt
         return x_prev, pred_x0
