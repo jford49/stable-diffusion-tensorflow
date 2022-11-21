@@ -123,10 +123,17 @@ class StableDiffusion:
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
         # Diffusion stage
+        latent_orgin = None
+        mix = None
+        latent_mix =  None
         out_list = []
         progbar = tqdm(list(enumerate(timesteps))[::-1])
         for index, timestep in progbar:
             progbar.set_description(f"{index:3d} {timestep:3d}")
+            
+            if latent_mix is not None:
+                latent = latent_mix
+                
             e_t = self.get_model_output(
                 latent,
                 timestep,
@@ -142,9 +149,6 @@ class StableDiffusion:
                 latent, e_t, index, a_t, a_prev)#, temperature, seed
             )
 
-            latent_orgin = None
-            mix = None
-            latent_mix =  None
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
                 # The intermediate latent will be merged with input latent.
@@ -158,8 +162,8 @@ class StableDiffusion:
                 latent_decoded = self.decoder.predict_on_batch(latent)
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
-                #mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
-                #latent_mix =  self.encoder(mix)
+                mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
+                latent_mix =  self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
@@ -177,9 +181,6 @@ class StableDiffusion:
                     mix = ((mix + 1) / 2) * 255            
                     mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
                     out_list.append((mix, "mix"))#'''
-                
-            if latent_mix is not None:
-                latent = latent_mix
                 
         decoded = self.decode_latent(latent, input_image_array, input_mask_array)
         if singles:
