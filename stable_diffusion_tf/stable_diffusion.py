@@ -181,11 +181,13 @@ class StableDiffusion:
             if latent_mix is not None:
                 latent = latent_mix
                 
-        if not singles:
-            decoded = self.decode_latent(latent, input_image_array, input_mask_array)
-            return [(decoded, "")]
+        decoded = self.decode_latent(latent, input_image_array, input_mask_array)
+        if singles:
+            out_list.append((decoded, "last"))
         else:
-            return out_list
+            out_list.append((decoded, ""))
+            
+        return out_list
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None):
         # Decoding stage
