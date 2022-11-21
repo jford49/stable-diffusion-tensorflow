@@ -93,11 +93,11 @@ class StableDiffusion:
             input_mask_array =  input_mask_array / 255.0
             #print("input_mask_array shape", input_mask_array.shape)
             
-            latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
-            latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
-            latent_mask = 1 - (latent_mask.astype("float") / 255.0)
+            #latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
+            #latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
+            #latent_mask = 1 - (latent_mask.astype("float") / 255.0)
             #print("latent_mask shape", latent_mask.shape)
-            latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
+            #latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
             #print("latent_mask_tensor shape", latent_mask_tensor.shape)
 
 
@@ -138,7 +138,7 @@ class StableDiffusion:
             a_t, a_prev = alphas[index], alphas_prev[index]
             
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
-                latent, e_t, index, a_t, a_prev, temperature, seed
+                latent, e_t, index, a_t, a_prev)#, temperature, seed
             )
 
             latent_orgin = None
@@ -251,14 +251,14 @@ class StableDiffusion:
             latent - unconditional_latent
         )
 
-    def get_x_prev_and_pred_x0(self, x, e_t, index, a_t, a_prev, temperature, seed):
-        sigma_t = 0
+    def get_x_prev_and_pred_x0(self, x, e_t, index, a_t, a_prev)#, temperature, seed):
+        #sigma_t = 0
         sqrt_one_minus_at = math.sqrt(1 - a_t)
         pred_x0 = (x - sqrt_one_minus_at * e_t) / math.sqrt(a_t)
 
         # Direction pointing to x_t
         dir_xt = math.sqrt(1.0 - a_prev - sigma_t**2) * e_t
-        noise = sigma_t * tf.random.normal(x.shape, seed=seed) * temperature
+        #noise = sigma_t * tf.random.normal(x.shape, seed=seed) * temperature
         x_prev = math.sqrt(a_prev) * pred_x0 + dir_xt
         return x_prev, pred_x0
 
