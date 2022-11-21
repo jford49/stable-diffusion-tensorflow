@@ -161,8 +161,8 @@ class StableDiffusion:
                 latent_decoded = self.decoder.predict_on_batch(latent)
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
-                mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
-                latent_mix =  self.encoder(mix)
+                #mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
+                #latent_mix =  self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
@@ -174,12 +174,12 @@ class StableDiffusion:
                 
                 s = '''if latent_orgin is not None:
                     decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
-                    out_list.append((decoded, "latent_orgin"))
+                    out_list.append((decoded, "latent_orgin"))#'''
                     
                 if mix is not None:
                     mix = ((mix + 1) / 2) * 255            
                     mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
-                    out_list.append((mix, "mix"))#'''
+                    out_list.append((mix, "mix"))
                 
         decoded = self.decode_latent(latent, input_image_array, input_mask_array)
         if singles:
