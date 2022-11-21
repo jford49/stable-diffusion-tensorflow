@@ -146,8 +146,7 @@ class StableDiffusion:
             a_t, a_prev = alphas[index], alphas_prev[index]
             
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
-                latent, e_t, index, a_t, a_prev)#, temperature, seed
-            )
+                latent, e_t, index, a_t, a_prev)#, temperature, seed)
 
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
