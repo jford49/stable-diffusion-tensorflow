@@ -254,7 +254,7 @@ class StableDiffusion:
             latent - unconditional_latent
         )
 
-    def get_x_prev_and_pred_x0(self, x, e_t, index, a_t, a_prev)#, temperature, seed):
+    def get_x_prev_and_pred_x0(self, x, e_t, index, a_t, a_prev):#, temperature, seed):
         #sigma_t = 0
         sqrt_one_minus_at = math.sqrt(1 - a_t)
         pred_x0 = (x - sqrt_one_minus_at * e_t) / math.sqrt(a_t)
