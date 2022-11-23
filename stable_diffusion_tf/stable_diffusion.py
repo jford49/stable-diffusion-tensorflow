@@ -61,6 +61,8 @@ class StableDiffusion:
         if batch_size == 0:
             batch_size = 1
             singles = True
+        
+        tf.random.set_seed(seed)
             
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
@@ -181,10 +183,8 @@ class StableDiffusion:
                     mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
                     out_list.append((mix, "mix"))
                 
-        decoded = self.decode_latent(latent, input_image_array, input_mask_array)
-        if singles:
-            out_list.append((decoded, "last"))
-        else:
+        if not singles:
+            decoded = self.decode_latent(latent, input_image_array, input_mask_array)
             out_list.append((decoded, ""))
             
         return out_list
