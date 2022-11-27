@@ -163,7 +163,7 @@ class StableDiffusion:
                 latent_decoded = self.decoder.predict_on_batch(latent)
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
-                mix = latent_orgin_decoded * (input_mask_array) + latent_decoded * (1 - input_mask_array)
+                mix = latent_orgin_decoded * (1 - input_mask_array) + latent_decoded * (input_mask_array)
                 latent_mix =  self.encoder(mix)
             
             if singles:
@@ -196,7 +196,7 @@ class StableDiffusion:
 
         if (input_image_array is not None) and (input_mask_array is not None):
           # Merge inpainting output with original image
-          decoded = input_image_array * (1-input_mask_array) + np.array(decoded) * input_mask_array
+          decoded = input_image_array * (input_mask_array) + np.array(decoded) * (1 - input_mask_array)
 
         return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
 
