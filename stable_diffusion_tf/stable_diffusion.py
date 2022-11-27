@@ -128,6 +128,7 @@ class StableDiffusion:
         latent_orgin = None
         mix = None
         latent_mix =  None
+        latent_orgin = latent
         out_list = []
         progbar = tqdm(list(enumerate(timesteps))[::-1])
         for index, timestep in progbar:
@@ -153,9 +154,9 @@ class StableDiffusion:
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
                 # The intermediate latent will be merged with input latent.
-                latent_orgin, alphas, alphas_prev = self.get_starting_parameters(
+                s='''latent_orgin, alphas, alphas_prev = self.get_starting_parameters(
                     timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
-                )
+                )#############'''
                 
                 #print("latent_orgin shape", latent_orgin.shape)
                 #latent = latent_orgin * latent_mask_tensor + latent * (1 - latent_mask_tensor)
