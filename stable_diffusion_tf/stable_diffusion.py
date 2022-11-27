@@ -154,7 +154,7 @@ class StableDiffusion:
             if input_mask is not None and input_image is not None:
                 # If mask is provided, noise at current timestep will be added to input image.
                 # The intermediate latent will be merged with input latent.
-                s='''latent_orgin, alphas, alphas_prev = self.get_starting_parameters(
+                latent_orgin, alphas, alphas_prev = self.get_starting_parameters(
                     timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
                 )#############'''
                 
@@ -175,7 +175,7 @@ class StableDiffusion:
                     decoded = self.decode_latent(latent, input_image_array, input_mask_array)
                     out_list.append((decoded, "latent masked"))
                 
-                if latent_orgin is not None:
+                s='''if latent_orgin is not None:
                     decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
                     out_list.append((decoded, "latent_orgin"))#################'''
                     
