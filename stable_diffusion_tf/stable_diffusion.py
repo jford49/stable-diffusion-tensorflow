@@ -179,10 +179,10 @@ class StableDiffusion:
                     decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
                     out_list.append((decoded, "latent_orgin"))#################'''
                     
-                if mix is not None:
+                s='''if mix is not None:
                     mix = ((mix + 1) / 2) * 255            
                     mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
-                    out_list.append((mix, "mix"))
+                    out_list.append((mix, "mix"))################'''
                 
         if not singles:
             decoded = self.decode_latent(latent, input_image_array, input_mask_array)
