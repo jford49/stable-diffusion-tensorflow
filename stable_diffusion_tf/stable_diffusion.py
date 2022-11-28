@@ -191,7 +191,7 @@ class StableDiffusion:
             if feedback:
                 decoded = self.decode_latent(latent)
             else:
-                decoded = self.decode_latent(latent, input_image_array, input_mask_array)
+                decoded = self.decode_latent(latent, input_image_array, input_mask_array, use_auto_mask)
                 
             out_list.append((decoded, ""))
             
