@@ -56,6 +56,7 @@ class StableDiffusion:
         input_image=None,
         input_mask=None,
         input_image_strength=0.5,
+        feedback = False
     ):
         singles = False
         if batch_size == 0:
@@ -128,7 +129,6 @@ class StableDiffusion:
         latent_orgin = None
         mix = None
         latent_mix =  None
-        latent_orgin = latent
         out_list = []
         progbar = tqdm(list(enumerate(timesteps))[::-1])
         for index, timestep in progbar:
@@ -165,8 +165,9 @@ class StableDiffusion:
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
                 # Feedback
-                mix = latent_orgin_decoded * (1 - input_mask_array) + latent_decoded * (input_mask_array)
-                latent_mix =  self.encoder(mix)
+                if feedback:
+                    mix = latent_orgin_decoded * (1 - input_mask_array) + latent_decoded * (input_mask_array)
+                    latent_mix =  self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
@@ -186,7 +187,11 @@ class StableDiffusion:
                     out_list.append((mix, "mix"))################'''
                 
         if not singles:
-            decoded = self.decode_latent(latent, input_image_array, input_mask_array)
+            if feedback:
+                decoded = self.decode_latent(latent)
+            else:
+                decoded = self.decode_latent(latent, input_image_array, input_mask_array)
+                
             out_list.append((decoded, ""))
             
         return out_list
