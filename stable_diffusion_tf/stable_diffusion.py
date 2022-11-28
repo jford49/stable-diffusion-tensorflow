@@ -164,8 +164,9 @@ class StableDiffusion:
                 latent_decoded = self.decoder.predict_on_batch(latent)
                 latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
                 
-                #mix = latent_orgin_decoded * (1 - input_mask_array) + latent_decoded * (input_mask_array)
-                #latent_mix =  self.encoder(mix)
+                # Feedback
+                mix = latent_orgin_decoded * (1 - input_mask_array) + latent_decoded * (input_mask_array)
+                latent_mix =  self.encoder(mix)
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
