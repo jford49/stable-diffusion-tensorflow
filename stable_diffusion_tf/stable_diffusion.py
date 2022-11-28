@@ -56,7 +56,8 @@ class StableDiffusion:
         input_image=None,
         input_mask=None,
         input_image_strength=0.5,
-        feedback = False
+        feedback = False,
+        use_auto_mask=False
     ):
         singles = False
         if batch_size == 0:
@@ -196,19 +197,25 @@ class StableDiffusion:
             
         return out_list
     
-    def decode_latent(self, latent, input_image_array=None, input_mask_array=None):
+    def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
         # Decoding stage
         decoded = self.decoder.predict_on_batch(latent)
-        decoded = ((decoded + 1) / 2) * 255
-        print("type(decoded)", type(decoded))
-        print("decoded.shape", decoded.shape)
+        #print("type(decoded)", type(decoded))   # type(decoded) <class 'numpy.ndarray'>
+        #print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
+        decoded = ((decoded + 1) / 2)
+        auto_mask = None
+        if use_auto_mask:
+            auto_mask = np.clip(decoded / .75, 0, 1)
+        decoded = decoded * 255
+        if use_auto_mask:
+            decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
 
         if (input_image_array is not None) or (input_mask_array is not None):
           # Merge inpainting output with original image
-          print("type(input_mask_array)", type(input_mask_array))
-          print("input_mask_array.shape", input_mask_array.shape)
+          #print("type(input_mask_array)", type(input_mask_array))   # type(input_mask_array) <class 'numpy.ndarray'>
+          #print("input_mask_array.shape", input_mask_array.shape)   # input_mask_array.shape (1, 512, 896, 3)
           decoded = input_image_array * (input_mask_array) + np.array(decoded) * (1 - input_mask_array)
-
+            
         return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
 
     def timestep_embedding(self, timesteps, dim=320, max_period=10000):
