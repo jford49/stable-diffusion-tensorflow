@@ -200,9 +200,13 @@ class StableDiffusion:
         # Decoding stage
         decoded = self.decoder.predict_on_batch(latent)
         decoded = ((decoded + 1) / 2) * 255
+        print("type(decoded)", type(decoded))
+        print("decoded.shape", decoded.shape)
 
         if (input_image_array is not None) or (input_mask_array is not None):
           # Merge inpainting output with original image
+          print("type(input_mask_array)", type(input_mask_array))
+          print("input_mask_array.shape", input_mask_array.shape)
           decoded = input_image_array * (input_mask_array) + np.array(decoded) * (1 - input_mask_array)
 
         return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
