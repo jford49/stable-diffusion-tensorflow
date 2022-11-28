@@ -205,12 +205,12 @@ class StableDiffusion:
         decoded = ((decoded + 1) / 2)
         auto_mask = None
         if use_auto_mask:
-            auto_mask = np.clip(decoded / .75, 0, 1)
+            auto_mask = np.clip((decoded - .25) / .5, 0, 1)
         decoded = decoded * 255
         if use_auto_mask:
             decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
 
-        if (input_image_array is not None) or (input_mask_array is not None):
+        if (input_image_array is not None) and (input_mask_array is not None):
           # Merge inpainting output with original image
           #print("type(input_mask_array)", type(input_mask_array))   # type(input_mask_array) <class 'numpy.ndarray'>
           #print("input_mask_array.shape", input_mask_array.shape)   # input_mask_array.shape (1, 512, 896, 3)
