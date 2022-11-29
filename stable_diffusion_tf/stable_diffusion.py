@@ -14,6 +14,7 @@ from PIL import Image
 
 MAX_TEXT_LEN = 77
 
+# https://github.com/divamgupta/stable-diffusion-tensorflow
 
 class StableDiffusion:
     def __init__(self, img_height=1000, img_width=1000, jit_compile=False, download_weights=True):
@@ -48,6 +49,7 @@ class StableDiffusion:
     def generate(
         self,
         prompt,
+        negative_prompt=None,
         batch_size=1,
         num_steps=25,
         unconditional_guidance_scale=7.5,
@@ -104,10 +106,16 @@ class StableDiffusion:
             #latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
             #print("latent_mask_tensor shape", latent_mask_tensor.shape)
 
+        # Tokenize negative prompt or use default padding tokens
+        unconditional_tokens = _UNCONDITIONAL_TOKENS
+        if negative_prompt is not None:
+            inputs = self.tokenizer.encode(negative_prompt)
+            assert len(inputs) < 77, "Negative prompt is too long (should be < 77 tokens)"
+            unconditional_tokens = inputs + [49407] * (77 - len(inputs))
 
         # Encode unconditional tokens (and their positions) into an
         # "unconditional context vector"
-        unconditional_tokens = np.array(_UNCONDITIONAL_TOKENS)[None].astype("int32")
+        unconditional_tokens = np.array(unconditional_tokens)[None].astype("int32")
         unconditional_tokens = np.repeat(unconditional_tokens, batch_size, axis=0)
         self.unconditional_tokens = tf.convert_to_tensor(unconditional_tokens)
         unconditional_context = self.text_encoder.predict_on_batch(
@@ -207,14 +215,18 @@ class StableDiffusion:
         if use_auto_mask:
             auto_mask = np.clip((decoded - .25) / .5, 0, 1)
         decoded = decoded * 255
-        if use_auto_mask:
-            decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
 
         if (input_image_array is not None) and (input_mask_array is not None):
           # Merge inpainting output with original image
           #print("type(input_mask_array)", type(input_mask_array))   # type(input_mask_array) <class 'numpy.ndarray'>
           #print("input_mask_array.shape", input_mask_array.shape)   # input_mask_array.shape (1, 512, 896, 3)
-          decoded = input_image_array * (input_mask_array) + np.array(decoded) * (1 - input_mask_array)
+            if use_auto_mask:
+                mask = np.minimum(auto_mask, input_mask_array)
+                decoded = input_image_array * (mask) + np.array(decoded) * (1 - mask)
+            else:
+                decoded = input_image_array * (input_mask_array) + np.array(decoded) * (1 - input_mask_array)
+        elif use_auto_mask:
+            decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
             
         return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
 
