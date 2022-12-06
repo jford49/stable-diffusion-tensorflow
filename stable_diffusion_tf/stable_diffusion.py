@@ -65,7 +65,8 @@ class StableDiffusion:
         if batch_size == 0:
             batch_size = 1
             singles = True
-        
+             
+        print("batch_size in", batch_size)
         tf.random.set_seed(seed)
             
         # Tokenize prompt (i.e. starting context)
@@ -203,6 +204,7 @@ class StableDiffusion:
                 
             out_list.append((decoded, ""))
             
+        print("batch_size out", batch_size)
         return out_list
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
