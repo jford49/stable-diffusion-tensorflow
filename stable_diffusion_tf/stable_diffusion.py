@@ -228,7 +228,7 @@ class StableDiffusion:
         elif use_auto_mask:
             decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
             
-        return np.clip(decoded, 0, 255).astype("uint8")#[0,:,:,:].astype("uint8")
+        return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
 
     def timestep_embedding(self, timesteps, dim=320, max_period=10000):
         half = dim // 2
