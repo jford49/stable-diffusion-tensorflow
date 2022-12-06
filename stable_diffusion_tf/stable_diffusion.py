@@ -66,7 +66,6 @@ class StableDiffusion:
             batch_size = 1
             singles = True
              
-        print("batch_size in", batch_size)
         tf.random.set_seed(seed)
             
         # Tokenize prompt (i.e. starting context)
@@ -204,14 +203,13 @@ class StableDiffusion:
                 
             out_list.append((decoded, ""))
             
-        print("batch_size out", batch_size)
         return out_list
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
         # Decoding stage
         decoded = self.decoder.predict_on_batch(latent)
         #print("type(decoded)", type(decoded))   # type(decoded) <class 'numpy.ndarray'>
-        #print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
+        print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
         decoded = ((decoded + 1) / 2)
         auto_mask = None
         if use_auto_mask:
@@ -230,7 +228,7 @@ class StableDiffusion:
         elif use_auto_mask:
             decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
             
-        return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
+        return np.clip(decoded, 0, 255).astype("uint8")#[0,:,:,:].astype("uint8")
 
     def timestep_embedding(self, timesteps, dim=320, max_period=10000):
         half = dim // 2
