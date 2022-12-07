@@ -210,9 +210,9 @@ class StableDiffusion:
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
         # Decoding stage
-        #decoded = self.decoder.predict_on_batch(latent)
+        decoded = self.decoder.predict_on_batch(latent)
         #print("type(decoded)", type(decoded))   # type(decoded) <class 'numpy.ndarray'>
-        print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
+        #print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
         decoded = ((decoded + 1) / 2)
         auto_mask = None
         if use_auto_mask:
