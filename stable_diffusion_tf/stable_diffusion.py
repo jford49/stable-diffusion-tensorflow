@@ -180,34 +180,37 @@ class StableDiffusion:
             
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
-                out_list.append((decoded, "latent"))
+                out_list.append((decoded[0,:,:,:], "latent"))
                 
                 if input_mask is not None and input_image is not None:
                     decoded = self.decode_latent(latent, input_image_array, input_mask_array)
-                    out_list.append((decoded, "latent masked"))
+                    out_list.append((decoded[0,:,:,:], "latent masked"))
                 
                 s='''if latent_orgin is not None:
                     decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
-                    out_list.append((decoded, "latent_orgin"))#################'''
+                    out_list.append((decoded[0,:,:,:], "latent_orgin"))#################'''
                     
                 s='''if mix is not None:
                     mix = ((mix + 1) / 2) * 255            
                     mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
                     out_list.append((mix, "mix"))################'''
                 
-        if not singles:
+        if singles:
+            out_list.append((decoded[0,:,:,:], ""))
+        else:
             if feedback:
                 decoded = self.decode_latent(latent)
+                out_list.append((decoded[0,:,:,:], ""))
             else:
                 decoded = self.decode_latent(latent, input_image_array, input_mask_array, use_auto_mask)
-                
-            out_list.append((decoded, ""))
-            
+                for i in range(decoded.shape[0]):
+                    out_list.append((decoded[i,:,:,:], ""))
+                       
         return out_list
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
         # Decoding stage
-        decoded = self.decoder.predict_on_batch(latent)
+        #decoded = self.decoder.predict_on_batch(latent)
         #print("type(decoded)", type(decoded))   # type(decoded) <class 'numpy.ndarray'>
         print("decoded.shape", decoded.shape)   # decoded.shape (1, 512, 896, 3)
         decoded = ((decoded + 1) / 2)
@@ -228,7 +231,7 @@ class StableDiffusion:
         elif use_auto_mask:
             decoded = input_image_array * (auto_mask) + np.array(decoded) * (1 - auto_mask)
             
-        return np.clip(decoded, 0, 255)[0,:,:,:].astype("uint8")
+        return np.clip(decoded, 0, 255).astype("uint8")
 
     def timestep_embedding(self, timesteps, dim=320, max_period=10000):
         half = dim // 2
