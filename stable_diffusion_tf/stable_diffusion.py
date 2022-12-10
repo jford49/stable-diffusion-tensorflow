@@ -46,7 +46,7 @@ class StableDiffusion:
         decoded = ((decoded + 1) / 2) * 255
         return np.clip(decoded, 0, 255).astype("uint8")[0,:,:,:]
     
-    def generate(
+    def generate_from_seed(
         self,
         prompt,
         negative_prompt=None,
