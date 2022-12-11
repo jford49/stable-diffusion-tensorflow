@@ -208,7 +208,7 @@ class StableDiffusion:
                        
         return out_list
     
-     def generate_from_noise(
+   def generate_from_noise(
         self,
         prompt,
         negative_prompt=None,
@@ -226,9 +226,9 @@ class StableDiffusion:
         if batch_size == 0:
             batch_size = 1
             singles = True
-             
+
         tf.random.set_seed(seed)
-            
+
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
         assert len(inputs) < 77, "Prompt is too long (should be < 77 tokens)"
@@ -240,7 +240,7 @@ class StableDiffusion:
         pos_ids = np.array(list(range(77)))[None].astype("int32")
         pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
-        
+
         input_image_tensor = None
         input_image_array = None
         if type(input_image) is str:
@@ -265,7 +265,7 @@ class StableDiffusion:
         unconditional_context = self.text_encoder.predict_on_batch(
             [self.unconditional_tokens, pos_ids]
         )
-        
+
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
@@ -273,7 +273,7 @@ class StableDiffusion:
             timesteps, batch_size, seed , input_image=input_image_tensor, 
             input_img_noise_t=input_img_noise_t, noise_block=noise_block
         )
-        
+
         #print("latent shape", latent.shape)
 
         if input_image is not None:
@@ -287,10 +287,10 @@ class StableDiffusion:
         progbar = tqdm(list(enumerate(timesteps))[::-1])
         for index, timestep in progbar:
             progbar.set_description(f"{index:3d} {timestep:3d}")
-            
+
             if latent_mix is not None:
                 latent = latent_mix
-                
+
             e_t = self.get_model_output(
                 latent,
                 timestep,
@@ -299,23 +299,23 @@ class StableDiffusion:
                 unconditional_guidance_scale,
                 batch_size,
             )
-            
+
             a_t, a_prev = alphas[index], alphas_prev[index]
-            
+
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
                 latent, e_t, index, a_t, a_prev)#, temperature, seed)
-            
+
             if singles:
                 decoded = self.decode_latent(latent)#, input_image_array)
                 out_list.append((decoded[0,:,:,:], "latent"))
-                
+
         if singles:
             out_list.append((decoded[0,:,:,:], ""))
         else:
             decoded = self.decode_latent(latent, input_image_array)
             for i in range(decoded.shape[0]):
                 out_list.append((decoded[i,:,:,:], ""))
-                       
+
         return out_list
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
