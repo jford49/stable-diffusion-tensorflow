@@ -207,8 +207,8 @@ class StableDiffusion:
                     out_list.append((decoded[i,:,:,:], ""))
                        
         return out_list
-    
-   def generate_from_noise(
+   
+    def generate_from_noise(
         self,
         prompt,
         negative_prompt=None,
@@ -221,7 +221,7 @@ class StableDiffusion:
         noise_block=None,
         input_image_strength=0.5,
         use_auto_mask=False
-   ):
+    ):
         singles = False
         if batch_size == 0:
             batch_size = 1
