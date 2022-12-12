@@ -271,7 +271,7 @@ class StableDiffusion:
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
             timesteps, batch_size, seed , input_image=input_image_tensor, 
-            input_img_noise_t=input_img_noise_t, noise_block=noise_block
+            input_img_noise_t=input_img_noise_t, noise=noise_block
         )
 
         #print("latent shape", latent.shape)
