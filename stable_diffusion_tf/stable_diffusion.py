@@ -104,7 +104,8 @@ class StableDiffusion:
             #latent_mask = 1 - (latent_mask.astype("float") / 255.0)
             #print("latent_mask shape", latent_mask.shape)
             #latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
-            #print("latent_mask_tensor shape", latent_mask_tensor.shape)
+            #print("latent_mask_tensor.shape", latent_mask_tensor.shape)    # latent_mask_tensor.shape (1, 64, 64, 3, 1)
+            
 
         # Tokenize negative prompt or use default padding tokens
         unconditional_tokens = _UNCONDITIONAL_TOKENS
