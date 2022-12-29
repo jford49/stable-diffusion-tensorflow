@@ -46,6 +46,9 @@ class StableDiffusion:
         decoded = ((decoded + 1) / 2) * 255
         return np.clip(decoded, 0, 255).astype("uint8")[0,:,:,:]
     
+    def alpha(self, time):
+        return _ALPHAS_CUMPROD[time]
+    
     def generate_from_seed(
         self,
         prompt,
