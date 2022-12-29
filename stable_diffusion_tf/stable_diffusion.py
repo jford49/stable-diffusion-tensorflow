@@ -216,6 +216,7 @@ class StableDiffusion:
         singles = False,
         num_steps=25,
         unconditional_guidance_scale=7.5,
+        input_image = False
         noise_block=None,
         input_image_strength=0.5,
         use_auto_mask=False
@@ -237,15 +238,14 @@ class StableDiffusion:
         pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
 
-        inpu_image = None
         input_image_tensor = None
         input_image_array = None
-        if type(input_image) is str:
+        s='''if type(input_image) is str:
             input_image = Image.open(input_image)
             input_image = input_image.resize((self.img_width, self.img_height))
             input_image_array = np.array(input_image, dtype=np.float32)[None,...,:3]
 
-            input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
+            input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)'''
 
         # Tokenize negative prompt or use default padding tokens
         unconditional_tokens = _UNCONDITIONAL_TOKENS
@@ -272,7 +272,7 @@ class StableDiffusion:
 
         #print("latent shape", latent.shape)
 
-        if input_image is not None:
+        if input_image:
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
         # Diffusion stage
@@ -308,7 +308,7 @@ class StableDiffusion:
         if singles:
             out_list.append((decoded[0,:,:,:], ""))
         else:
-            decoded = self.decode_latent(latent, input_image_array)
+            decoded = self.decode_latent(latent)#, input_image_array)
             for i in range(decoded.shape[0]):
                 out_list.append((decoded[i,:,:,:], ""))
 
