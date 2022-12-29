@@ -216,15 +216,13 @@ class StableDiffusion:
         singles = False,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        temperature=1,
-        seed=None,
-        input_image=None,
         noise_block=None,
         input_image_strength=0.5,
         use_auto_mask=False
     ):
             
         batch_size = 1
+        seed = 1
         tf.random.set_seed(seed)
 
         # Tokenize prompt (i.e. starting context)
@@ -239,6 +237,7 @@ class StableDiffusion:
         pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
 
+        inpu_image = None
         input_image_tensor = None
         input_image_array = None
         if type(input_image) is str:
@@ -268,8 +267,7 @@ class StableDiffusion:
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
-            timesteps, batch_size, seed , input_image=input_image_tensor, 
-            input_img_noise_t=input_img_noise_t, noise=noise_block
+            timesteps, batch_size, seed , noise=noise_block
         )
 
         #print("latent shape", latent.shape)
@@ -301,10 +299,10 @@ class StableDiffusion:
             a_t, a_prev = alphas[index], alphas_prev[index]
 
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
-                latent, e_t, index, a_t, a_prev)#, temperature, seed)
+                latent, e_t, index, a_t, a_prev)
 
             if singles:
-                decoded = self.decode_latent(latent)#, input_image_array)
+                decoded = self.decode_latent(latent)
                 out_list.append((decoded[0,:,:,:], "latent"))
 
         if singles:
