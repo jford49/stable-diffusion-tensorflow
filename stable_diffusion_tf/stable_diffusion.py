@@ -216,7 +216,7 @@ class StableDiffusion:
         singles = False,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        input_image = False
+        input_image = None,
         noise_block=None,
         input_image_strength=0.5,
         use_auto_mask=False
