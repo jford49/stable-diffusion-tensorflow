@@ -265,7 +265,7 @@ class StableDiffusion:
 
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        #input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
             timesteps, batch_size, seed , noise=noise_block
         )
