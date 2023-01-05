@@ -215,13 +215,12 @@ class StableDiffusion:
         negative_prompt=None,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        seed=None,
         input_image = None,
         noise_block=None,
         input_image_strength=0.5,
         use_auto_mask=False
     ):
-            
+        seed = 1    
         singles = False
         batch_size = 1
         tf.random.set_seed(seed)
