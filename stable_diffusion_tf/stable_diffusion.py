@@ -215,6 +215,7 @@ class StableDiffusion:
         negative_prompt=None,
         num_steps=25,
         unconditional_guidance_scale=7.5,
+        seed=None,
         input_image = None,
         noise_block=None,
         input_image_strength=0.5,
@@ -223,7 +224,6 @@ class StableDiffusion:
             
         singles = False
         batch_size = 1
-        seed = 1
         tf.random.set_seed(seed)
 
         # Tokenize prompt (i.e. starting context)
