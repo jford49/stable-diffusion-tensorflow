@@ -271,7 +271,7 @@ class StableDiffusion:
 
         #print("latent shape", latent.shape)
 
-        if input_image:
+        if input_image is not None:
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
         # Diffusion stage
