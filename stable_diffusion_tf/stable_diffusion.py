@@ -312,50 +312,10 @@ class StableDiffusion:
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
                 latent, e_t, index, a_t, a_prev)#, temperature, seed)
 
-            if input_mask is not None and input_image is not None:
-                # If mask is provided, noise at current timestep will be added to input image.
-                # The intermediate latent will be merged with input latent.
-                latent_orgin, alphas, alphas_prev = self.get_starting_parameters(
-                    timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=timestep
-                )#############'''
-                
-                #print("latent_orgin shape", latent_orgin.shape)
-                #latent = latent_orgin * latent_mask_tensor + latent * (1 - latent_mask_tensor)
-                
-                latent_decoded = self.decoder.predict_on_batch(latent)
-                latent_orgin_decoded = self.decoder.predict_on_batch(latent_orgin)
-                
-            if singles:
-                decoded = self.decode_latent(latent)#, input_image_array, input_mask_array)
-                out_list.append((decoded[0,:,:,:], "latent"))
-                
-                if input_mask is not None and input_image is not None:
-                    decoded = self.decode_latent(latent, input_image_array, input_mask_array)
-                    out_list.append((decoded[0,:,:,:], "latent masked"))
-                
-                s='''if latent_orgin is not None:
-                    decoded = self.decode_latent(latent_orgin)#, input_image_array, input_mask_array)
-                    out_list.append((decoded[0,:,:,:], "latent_orgin"))#################'''
-                    
-                s='''if mix is not None:
-                    mix = ((mix + 1) / 2) * 255            
-                    mix = np.clip(mix, 0, 255)[0,:,:,:].astype("uint8")
-                    out_list.append((mix, "mix"))################'''
-                
-        if singles:
-            out_list.append((decoded[0,:,:,:], ""))
-        else:
-            if feedback:
-                decoded = self.decode_latent(latent)
-                out_list.append((decoded[0,:,:,:], ""))
-            else:
-                decoded = self.decode_latent(latent, input_image_array, input_mask_array, use_auto_mask)
-                for i in range(decoded.shape[0]):
-                    out_list.append((decoded[i,:,:,:], ""))
+        decoded = self.decode_latent(latent, input_image_array, input_mask_array, use_auto_mask)
+        out_list.append((decoded[0,:,:,:], ""))
                        
         return out_list
-   
-    
     
     def decode_latent(self, latent, input_image_array=None, input_mask_array=None, use_auto_mask=False):
         # Decoding stage
