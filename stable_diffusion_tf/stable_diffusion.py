@@ -216,16 +216,16 @@ class StableDiffusion:
         num_steps=25,
         unconditional_guidance_scale=7.5,
         temperature=1,
-        seed=None,
+        noise_block = None,
         input_image=None,
-        input_mask=None,
         input_image_strength=0.5,
         use_auto_mask=False
     ):
         singles = False
         batch_size = 1
+        seed = 1
              
-        tf.random.set_seed(seed)
+        #tf.random.set_seed(seed)
             
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
@@ -243,21 +243,8 @@ class StableDiffusion:
         input_image_array = None
 
         input_mask_array = None
-        if type(input_mask) is str:
-            input_mask = Image.open(input_mask)
-            input_mask = input_mask.resize((self.img_width, self.img_height))
-            input_mask_array = np.array(input_mask, dtype=np.float32)[None,...,:3]
-            input_mask_array =  input_mask_array / 255.0
-            #print("input_mask_array shape", input_mask_array.shape)
-            
-            #latent_mask = input_mask.resize((self.img_width//8, self.img_height//8))
-            #latent_mask = np.array(latent_mask, dtype=np.float32)[None,...,None]
-            #latent_mask = 1 - (latent_mask.astype("float") / 255.0)
-            #print("latent_mask shape", latent_mask.shape)
-            #latent_mask_tensor = tf.cast(tf.repeat(latent_mask, batch_size , axis=0), self.dtype)
-            #print("latent_mask_tensor.shape", latent_mask_tensor.shape)    # latent_mask_tensor.shape (1, 64, 64, 3, 1)
-            
-
+        input_mask=None
+        
         # Tokenize negative prompt or use default padding tokens
         unconditional_tokens = _UNCONDITIONAL_TOKENS
         if negative_prompt is not None:
@@ -278,7 +265,7 @@ class StableDiffusion:
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
-            timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t
+            timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t, noise=noise_block
         )
         
         #print("latent shape", latent.shape)
@@ -310,7 +297,7 @@ class StableDiffusion:
             a_t, a_prev = alphas[index], alphas_prev[index]
             
             latent, pred_x0 = self.get_x_prev_and_pred_x0(
-                latent, e_t, index, a_t, a_prev)#, temperature, seed)
+                latent, e_t, index, a_t, a_prev)
 
         decoded = self.decode_latent(latent, input_image_array, input_mask_array, use_auto_mask)
         out_list.append((decoded[0,:,:,:], ""))
