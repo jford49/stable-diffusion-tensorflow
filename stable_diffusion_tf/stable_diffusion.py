@@ -215,7 +215,6 @@ class StableDiffusion:
         negative_prompt=None,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        temperature=1,
         noise_block = None,
         input_image=None,
         input_image_strength=0.5,
@@ -225,8 +224,6 @@ class StableDiffusion:
         batch_size = 1
         seed = 1
              
-        #tf.random.set_seed(seed)
-            
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
         assert len(inputs) < 77, "Prompt is too long (should be < 77 tokens)"
@@ -263,13 +260,10 @@ class StableDiffusion:
         
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
-            timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t, noise=noise_block
+            timesteps, batch_size, seed , noise=noise_block
         )
         
-        #print("latent shape", latent.shape)
-
         if input_image is not None:
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
