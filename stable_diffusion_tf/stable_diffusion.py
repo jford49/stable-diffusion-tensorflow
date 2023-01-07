@@ -209,6 +209,38 @@ class StableDiffusion:
                        
         return out_list
     
+    def get_noise(
+        self,
+        num_steps=25,
+        unconditional_guidance_scale=7.5,
+        temperature=1,
+        seed=None,
+        input_image=None,
+        input_image_strength=0.5,
+    ):
+        
+        tf.random.set_seed(seed)
+        
+        input_image_tensor = None
+        input_image_array = None
+        if type(input_image) is str:
+            input_image = Image.open(input_image)
+            input_image = input_image.resize((self.img_width, self.img_height))
+            input_image_array = np.array(input_image, dtype=np.float32)[None,...,:3]
+            #print("input_image_array shape", input_image_array.shape)
+
+            input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
+            #print("input_image_tensor shape", input_image_tensor.shape)         
+        
+        # Return evenly spaced values within a given interval
+        timesteps = np.arange(1, 1000, 1000 // num_steps)
+        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        latent, alphas, alphas_prev = self.get_starting_parameters(
+            timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t
+        )
+        
+        return latent
+    
     def generate_from_noise(
         self,
         prompt,
