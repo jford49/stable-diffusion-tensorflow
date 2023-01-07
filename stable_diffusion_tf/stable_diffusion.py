@@ -212,7 +212,6 @@ class StableDiffusion:
     def get_noise(
         self,
         num_steps=25,
-        unconditional_guidance_scale=7.5,
         temperature=1,
         seed=None,
         input_image=None,
