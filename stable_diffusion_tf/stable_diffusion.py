@@ -247,7 +247,7 @@ class StableDiffusion:
         num_steps=25,
         unconditional_guidance_scale=7.5,
         noise_block = None,
-        input_image=None,
+        time_length_mult=1,
         input_image_strength=0.5,
         use_auto_mask=False
     ):
@@ -295,8 +295,7 @@ class StableDiffusion:
             timesteps, batch_size, seed , noise=noise_block
         )
         
-        if input_image is not None:
-            timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
+        timesteps = timesteps[: int(len(timesteps)*time_length_mult)]
 
         # Diffusion stage
         latent_orgin = None
