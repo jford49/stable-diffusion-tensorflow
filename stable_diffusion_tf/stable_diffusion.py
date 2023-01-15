@@ -209,7 +209,31 @@ class StableDiffusion:
                        
         return out_list
     
-    def get_noise_img(
+    def get_noise_latent(
+        self, 
+        seed,
+        input_image=None
+    ):
+        tf.random.set_seed(seed)
+        n_h = self.img_height // 8
+        n_w = self.img_width // 8
+        
+        input_image_tensor = None
+        input_image_array = None
+        latent = None
+        if type(input_image) is str:
+            input_image = Image.open(input_image)
+            input_image = input_image.resize((self.img_width, self.img_height))
+            input_image_array = np.array(input_image, dtype=np.float32)[None,...,:3]
+            #print("input_image_array shape", input_image_array.shape)
+
+            input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
+            #print("input_image_tensor shape", input_image_tensor.shape)
+            latent = self.encoder(input_image_tensor)    
+            
+        return tf.random.normal((1, n_h, n_w, 4), seed=seed), latent
+    
+    def get_noisy_img(
         self,
         num_steps=25,
         temperature=1,
@@ -240,21 +264,82 @@ class StableDiffusion:
         
         return latent
     
+    def add_noise_latent(
+        self,
+        noise_block = None,
+        latent=None,
+        num_steps=25,
+        temperature=1,
+        input_image_strength=0.5,
+    ):                 
+        # Return evenly spaced values within a given interval
+        timesteps = np.arange(1, 1000, 1000 // num_steps)
+        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        
+        return self.add_noise(latent, input_img_noise_t, noise_block)
+    
+    def generate_from_latent_noise(
+        self,
+        latent_noise,
+        prompt,
+        negative_prompt=None,
+        num_steps=25,
+        unconditional_guidance_scale=7.5,
+        time_length_mult=1,
+        use_auto_mask=False
+    ):
+        return tokenize_diffuse(
+            latent_noise, 
+            prompt, 
+            negative_prompt=negative_prompt, 
+            num_steps=num_steps,
+            unconditional_guidance_scale=unconditional_guidance_scale,
+            input_image_strength=input_image_strength,
+            use_auto_mask=use_auto_mask
+        )
+        
     def generate_from_noise_img(
         self,
         prompt,
         negative_prompt=None,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        noise_block = None,
-        time_length_mult=1,
-        input_image_strength=0.5,
+        noise_img_block = None,
+        input_image_strength=1,
         use_auto_mask=False
     ):
+        
+        # Return evenly spaced values within a given interval
+        timesteps = np.arange(1, 1000, 1000 // num_steps)
+        latent, alphas, alphas_prev = self.get_starting_parameters(
+            timesteps, batch_size, seed , noise=noise_img_block
+        )
+        
+        return tokenize_diffuse(
+            latent, 
+            prompt, 
+            negative_prompt=negative_prompt, 
+            num_steps=num_steps,
+            unconditional_guidance_scale=unconditional_guidance_scale,
+            input_image_strength=input_image_strength,
+            use_auto_mask=use_auto_mask
+        )
+        
+    def tokenize_diffuse(
+        self,
+        latent,
+        prompt,
+        negative_prompt=None,
+        num_steps=25,
+        unconditional_guidance_scale=7.5,
+        input_image_strength=1,
+        use_auto_mask=False
+    ):
+          
         singles = False
         batch_size = 1
         seed = 1
-             
+        
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
         assert len(inputs) < 77, "Prompt is too long (should be < 77 tokens)"
@@ -289,14 +374,11 @@ class StableDiffusion:
             [self.unconditional_tokens, pos_ids]
         )
         
-        # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        latent, alphas, alphas_prev = self.get_starting_parameters(
-            timesteps, batch_size, seed , noise=noise_block
-        )
+        alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
+        alphas_prev = [1.0] + alphas[:-1]
+        timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
         
-        timesteps = timesteps[: int(len(timesteps)*time_length_mult)]
-
         # Diffusion stage
         latent_orgin = None
         mix = None
