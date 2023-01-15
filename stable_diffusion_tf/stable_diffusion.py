@@ -266,12 +266,15 @@ class StableDiffusion:
     
     def add_noise_latent(
         self,
-        noise_block = None,
+        noise_block,
         latent=None,
         num_steps=25,
         temperature=1,
         input_image_strength=0.5,
-    ):                 
+    ):      
+        if latent is None:
+            return noise_block
+        
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
