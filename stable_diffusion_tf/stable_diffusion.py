@@ -288,7 +288,7 @@ class StableDiffusion:
         negative_prompt=None,
         num_steps=25,
         unconditional_guidance_scale=7.5,
-        time_length_mult=1,
+        input_image_strength=1,
         use_auto_mask=False
     ):
         return tokenize_diffuse(
