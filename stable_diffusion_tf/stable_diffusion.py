@@ -362,14 +362,14 @@ class StableDiffusion:
         embedding = np.concatenate([np.cos(args), np.sin(args)])
         return tf.convert_to_tensor(embedding.reshape(1, -1),dtype=self.dtype)
 
-    def add_noise(self, x , t , noise = None):
-        batch_size,w,h = x.shape[0] , x.shape[1] , x.shape[2]
+    def add_noise(self, latent , t , noise = None):
+        batch_size,w,h = latent.shape[0] , latent.shape[1] , latent.shape[2]
         if noise is None:
             noise = tf.random.normal((batch_size,w,h,4), dtype=self.dtype)
         # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         sqrt_alpha_prod = _ALPHAS_CUMPROD[t] ** 0.5
         sqrt_one_minus_alpha_prod = (1 - _ALPHAS_CUMPROD[t]) ** 0.5
-        return  sqrt_alpha_prod * x + sqrt_one_minus_alpha_prod * noise
+        return  sqrt_alpha_prod * latent + sqrt_one_minus_alpha_prod * noise
 
     def get_starting_parameters(self, timesteps, batch_size, seed, input_image=None, input_img_noise_t=None, noise = None):
         n_h = self.img_height // 8
