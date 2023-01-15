@@ -209,7 +209,7 @@ class StableDiffusion:
                        
         return out_list
     
-    def get_noise(
+    def get_noise_img(
         self,
         num_steps=25,
         temperature=1,
@@ -240,7 +240,7 @@ class StableDiffusion:
         
         return latent
     
-    def generate_from_noise(
+    def generate_from_noise_img(
         self,
         prompt,
         negative_prompt=None,
