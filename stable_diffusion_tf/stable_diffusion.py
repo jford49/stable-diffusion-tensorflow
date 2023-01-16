@@ -291,7 +291,7 @@ class StableDiffusion:
         input_image_strength=1,
         use_auto_mask=False
     ):
-        return tokenize_diffuse(
+        return self.tokenize_diffuse(
             latent_noise, 
             prompt, 
             negative_prompt=negative_prompt, 
@@ -318,7 +318,7 @@ class StableDiffusion:
             timesteps, batch_size, seed , noise=noise_img_block
         )
         
-        return tokenize_diffuse(
+        return self.tokenize_diffuse(
             latent, 
             prompt, 
             negative_prompt=negative_prompt, 
