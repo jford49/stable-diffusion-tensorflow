@@ -86,10 +86,10 @@ class StableDiffusion:
             input_image = Image.open(input_image)
             input_image = input_image.resize((self.img_width, self.img_height))
             input_image_array = np.array(input_image, dtype=np.float32)[None,...,:3]
-            #print("input_image_array shape", input_image_array.shape)
+            print("generate_from_seed:input_image_array shape", input_image_array.shape)
 
             input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
-            #print("input_image_tensor shape", input_image_tensor.shape)
+            print("generate_from_seed:input_image_tensor shape", input_image_tensor.shape)
 
         input_mask_array = None
         if type(input_mask) is str:
@@ -225,10 +225,10 @@ class StableDiffusion:
             input_image = Image.open(input_image)
             input_image = input_image.resize((self.img_width, self.img_height))
             input_image_array = np.array(input_image, dtype=np.float32)[None,...,:3]
-            print("input_image_array shape", input_image_array.shape)
+            print("get_noise_latent:input_image_array shape", input_image_array.shape)
 
             input_image_tensor = tf.cast((input_image_array / 255.0) * 2 - 1, self.dtype)
-            print("input_image_tensor shape", input_image_tensor.shape)
+            print("get_noise_latent:input_image_tensor shape", input_image_tensor.shape)
             latent = self.encoder(input_image_tensor)    
             
         return tf.random.normal((1, n_h, n_w, 4), seed=seed), latent
