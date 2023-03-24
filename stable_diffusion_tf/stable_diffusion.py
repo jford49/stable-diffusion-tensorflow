@@ -483,6 +483,7 @@ class StableDiffusion:
                 latent = noise
         else:
             # input_image is -1 to 1
+            print("get_starting_parameters:input_image shape", input_image.shape)
             latent = self.encoder(input_image)
             #print("latent after encode shape", latent.shape)
             latent = tf.repeat(latent , batch_size , axis=0)
