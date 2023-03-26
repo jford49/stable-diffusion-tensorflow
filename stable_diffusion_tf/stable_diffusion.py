@@ -400,7 +400,7 @@ class StableDiffusion:
         alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
         idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
-        timesteps = timesteps[: idx_time)]
+        timesteps = timesteps[: idx_time]
         
         # Diffusion stage
         latent_orgin = None
