@@ -125,7 +125,8 @@ class StableDiffusion:
         
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength*temperature))
+        input_img_noise_t = timesteps[ idx_time ]
         latent, alphas, alphas_prev = self.get_starting_parameters(
             timesteps, batch_size, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t
         )
@@ -133,6 +134,7 @@ class StableDiffusion:
         #print("latent shape", latent.shape)
 
         if input_image is not None:
+            idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
             timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
 
         # Diffusion stage
@@ -270,7 +272,8 @@ class StableDiffusion:
         
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength*temperature))
+        input_img_noise_t = timesteps[idx_time]
         latent, alphas, alphas_prev = self.get_starting_parameters(
             timesteps, 1, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t
         )
@@ -290,7 +293,8 @@ class StableDiffusion:
         
         # Return evenly spaced values within a given interval
         timesteps = np.arange(1, 1000, 1000 // num_steps)
-        input_img_noise_t = timesteps[ int(len(timesteps)*input_image_strength*temperature) ]
+        idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength*temperature))
+        input_img_noise_t = timesteps[ idx_time ]
         
         return self.add_noise(latent, input_img_noise_t, noise_block)
     
@@ -395,7 +399,8 @@ class StableDiffusion:
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
-        timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
+        idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
+        timesteps = timesteps[: idx_time)]
         
         # Diffusion stage
         latent_orgin = None
