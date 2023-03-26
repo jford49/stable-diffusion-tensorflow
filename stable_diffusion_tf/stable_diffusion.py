@@ -135,7 +135,7 @@ class StableDiffusion:
 
         if input_image is not None:
             idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
-            timesteps = timesteps[: int(len(timesteps)*input_image_strength)]
+            timesteps = timesteps[: idx_time]
 
         # Diffusion stage
         latent_orgin = None
