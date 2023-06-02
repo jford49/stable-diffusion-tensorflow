@@ -405,7 +405,7 @@ class StableDiffusion:
         alphas_prev = [1.0] + alphas[:-1]
         idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
         print(num_steps, idx_time, timesteps[idx_time])
-        timesteps = timesteps[: idx_time]
+        #timesteps = timesteps[: idx_time]
         print(timesteps)
         
         # Diffusion stage
