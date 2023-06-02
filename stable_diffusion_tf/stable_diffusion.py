@@ -137,6 +137,7 @@ class StableDiffusion:
             idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
             timesteps = timesteps[: idx_time]
 
+        print(num_steps, idx_time, timesteps[idx_time])
         # Diffusion stage
         latent_orgin = None
         mix = None
@@ -274,6 +275,7 @@ class StableDiffusion:
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength*temperature))
         input_img_noise_t = timesteps[idx_time]
+        print(num_steps, idx_time, input_img_noise_t)
         latent, alphas, alphas_prev = self.get_starting_parameters(
             timesteps, 1, seed , input_image=input_image_tensor, input_img_noise_t=input_img_noise_t
         )
@@ -400,6 +402,7 @@ class StableDiffusion:
         alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
         idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
+        print(num_steps, idx_time, timesteps[idx_time])
         timesteps = timesteps[: idx_time]
         
         # Diffusion stage
