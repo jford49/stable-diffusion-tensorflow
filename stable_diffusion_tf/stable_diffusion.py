@@ -137,7 +137,7 @@ class StableDiffusion:
             idx_time = min(len(timesteps)-1, int(len(timesteps)*input_image_strength))
             timesteps = timesteps[: idx_time]
 
-        #print(num_steps, idx_time, timesteps[idx_time])
+        print(num_steps, idx_time, timesteps[idx_time])
         # Diffusion stage
         latent_orgin = None
         mix = None
