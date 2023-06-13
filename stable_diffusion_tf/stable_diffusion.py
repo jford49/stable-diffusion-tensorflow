@@ -53,7 +53,6 @@ class StableDiffusion:
         
         # Encode prompt tokens (and their positions) into a "context vector"
         pos_ids = np.array(list(range(77)))[None].astype("int32")
-        pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         return prompt, context
     
