@@ -54,7 +54,7 @@ class StableDiffusion:
         # Encode prompt tokens (and their positions) into a "context vector"
         pos_ids = np.array(list(range(77)))[None].astype("int32")
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
-        return inputs, context
+        return inputs, phrase, context
     
     def generate_from_seed(
         self,
