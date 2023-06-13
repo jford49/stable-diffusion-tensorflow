@@ -46,6 +46,17 @@ class StableDiffusion:
         decoded = ((decoded + 1) / 2) * 255
         return np.clip(decoded, 0, 255).astype("uint8")[0,:,:,:]
     
+    def text_encode(self, prompt):
+        inputs = self.tokenizer.encode(prompt)
+        phrase = inputs + [49407] * (77 - len(inputs))
+        phrase = np.array(phrase)[None].astype("int32")
+        
+        # Encode prompt tokens (and their positions) into a "context vector"
+        pos_ids = np.array(list(range(77)))[None].astype("int32")
+        pos_ids = np.repeat(pos_ids, batch_size, axis=0)
+        context = self.text_encoder.predict_on_batch([phrase, pos_ids])
+        return prompt, context
+    
     def generate_from_seed(
         self,
         prompt,
