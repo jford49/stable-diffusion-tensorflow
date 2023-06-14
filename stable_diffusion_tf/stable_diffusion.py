@@ -56,7 +56,7 @@ class StableDiffusion:
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         return inputs, phrase, context
     
-    def tokenizer_decode(inputs):
+    def tokenizer_decode(self, inputs):
         # tokens to text
         return self.tokenizer.decode(inputs);
     
