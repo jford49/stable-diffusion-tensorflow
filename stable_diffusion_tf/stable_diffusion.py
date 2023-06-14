@@ -403,21 +403,17 @@ class StableDiffusion:
         self,
         prompt,
         negative_prompt=None
-    ):        
-        singles = False
-        batch_size = 1
-        seed = 1
-        
+    ):            
         # Tokenize prompt (i.e. starting context)
         inputs = self.tokenizer.encode(prompt)
         assert len(inputs) < 77, "Prompt is too long (should be < 77 tokens)"
         phrase = inputs + [49407] * (77 - len(inputs))
         phrase = np.array(phrase)[None].astype("int32")
-        phrase = np.repeat(phrase, batch_size, axis=0)
+        #phrase = np.repeat(phrase, batch_size, axis=0)
 
         # Encode prompt tokens (and their positions) into a "context vector"
         pos_ids = np.array(list(range(77)))[None].astype("int32")
-        pos_ids = np.repeat(pos_ids, batch_size, axis=0)
+        #pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         
         # Tokenize negative prompt or use default padding tokens
@@ -430,7 +426,7 @@ class StableDiffusion:
         # Encode unconditional tokens (and their positions) into an
         # "unconditional context vector"
         unconditional_tokens = np.array(unconditional_tokens)[None].astype("int32")
-        unconditional_tokens = np.repeat(unconditional_tokens, batch_size, axis=0)
+        #unconditional_tokens = np.repeat(unconditional_tokens, batch_size, axis=0)
         self.unconditional_tokens = tf.convert_to_tensor(unconditional_tokens)
         unconditional_context = self.text_encoder.predict_on_batch(
             [self.unconditional_tokens, pos_ids]
@@ -448,6 +444,8 @@ class StableDiffusion:
         input_image_strength=1,
         use_auto_mask=False
     ):
+        batch_size = 1
+        
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
