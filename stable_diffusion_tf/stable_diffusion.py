@@ -327,7 +327,24 @@ class StableDiffusion:
         input_image_strength=1,
         use_auto_mask=False
     ):
-        return self.tokenize_diffuse(
+        
+        context, unconditional_context = self.tokenize(
+            prompt, 
+            negative_prompt,
+            num_steps
+        )
+        
+        return self.diffuse(
+            latent_noise, 
+            context,
+            unconditional_context,
+            num_steps, 
+            unconditional_guidance_scale, 
+            input_image_strength,
+            use_auto_mask
+        )
+    
+        s='''return self.tokenize_diffuse(
             latent_noise, 
             prompt, 
             negative_prompt=negative_prompt, 
@@ -335,7 +352,7 @@ class StableDiffusion:
             unconditional_guidance_scale=unconditional_guidance_scale,
             input_image_strength=input_image_strength,
             use_auto_mask=use_auto_mask
-        )
+        )#'''
         
     def generate_from_noise_img(
         self,
@@ -356,7 +373,23 @@ class StableDiffusion:
             timesteps, batch_size, seed , noise=noise_img_block
         )
         
-        return self.tokenize_diffuse(
+        context, unconditional_context = self.tokenize(
+            prompt, 
+            negative_prompt,
+            num_steps
+        )
+        
+        return self.diffuse(
+            latent, 
+            context,
+            unconditional_context,
+            num_steps, 
+            unconditional_guidance_scale, 
+            input_image_strength,
+            use_auto_mask
+        )
+    
+        s='''return self.tokenize_diffuse(
             latent, 
             prompt, 
             negative_prompt=negative_prompt, 
@@ -364,19 +397,13 @@ class StableDiffusion:
             unconditional_guidance_scale=unconditional_guidance_scale,
             input_image_strength=input_image_strength,
             use_auto_mask=use_auto_mask
-        )
+        )#'''
         
-    def tokenize_diffuse(
+    def tokenize(
         self,
-        latent,
         prompt,
-        negative_prompt=None,
-        num_steps=25,
-        unconditional_guidance_scale=7.5,
-        input_image_strength=1,
-        use_auto_mask=False
-    ):
-          
+        negative_prompt=None
+    ):        
         singles = False
         batch_size = 1
         seed = 1
@@ -392,12 +419,6 @@ class StableDiffusion:
         pos_ids = np.array(list(range(77)))[None].astype("int32")
         pos_ids = np.repeat(pos_ids, batch_size, axis=0)
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
-        
-        input_image_tensor = None
-        input_image_array = None
-
-        input_mask_array = None
-        input_mask=None
         
         # Tokenize negative prompt or use default padding tokens
         unconditional_tokens = _UNCONDITIONAL_TOKENS
@@ -415,6 +436,18 @@ class StableDiffusion:
             [self.unconditional_tokens, pos_ids]
         )
         
+        return context, unconditional_context
+    
+     def diffuse(
+        self,
+        latent,
+        context,
+        unconditional_context,
+        num_steps=25,
+        unconditional_guidance_scale=7.5,
+        input_image_strength=1,
+        use_auto_mask=False
+    ):
         timesteps = np.arange(1, 1000, 1000 // num_steps)
         alphas = [_ALPHAS_CUMPROD[t] for t in timesteps]    # _ALPHAS_CUMPROD[0] = .99915, _ALPHAS_CUMPROD[999] = .00466
         alphas_prev = [1.0] + alphas[:-1]
@@ -422,6 +455,12 @@ class StableDiffusion:
         #print(num_steps, idx_time, timesteps[idx_time])
         #timesteps = timesteps[: idx_time]
         #print(timesteps)
+        
+        input_image_tensor = None
+        input_image_array = None
+
+        input_mask_array = None
+        input_mask=None
         
         # Diffusion stage
         latent_orgin = None
