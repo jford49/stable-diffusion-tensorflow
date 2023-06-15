@@ -463,7 +463,7 @@ class StableDiffusion:
         
         return context, unconditional_context
     
-     def diffuse(
+    def diffuse(
         self,
         latent,
         context,
