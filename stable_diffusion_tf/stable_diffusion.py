@@ -398,6 +398,35 @@ class StableDiffusion:
             input_image_strength=input_image_strength,
             use_auto_mask=use_auto_mask
         )#'''
+       
+    def generate_from_context(
+        self, 
+        context,
+        unconditional_context,
+        num_steps=25,
+        unconditional_guidance_scale=7.5,
+        noise_img_block = None,
+        input_image_strength=1,
+        use_auto_mask=False
+    ):   
+        batch_size = 1
+        seed = 1
+        
+        # Return evenly spaced values within a given interval
+        timesteps = np.arange(1, 1000, 1000 // num_steps)
+        latent, alphas, alphas_prev = self.get_starting_parameters(
+            timesteps, batch_size, seed , noise=noise_img_block
+        )
+        
+        return self.diffuse(
+            latent, 
+            context,
+            unconditional_context,
+            num_steps, 
+            unconditional_guidance_scale, 
+            input_image_strength,
+            use_auto_mask
+        ) 
         
     def tokenize(
         self,
