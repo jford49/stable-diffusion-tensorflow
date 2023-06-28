@@ -55,6 +55,14 @@ class StableDiffusion:
         pos_ids = np.array(list(range(77)))[None].astype("int32")
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         return inputs, context
+
+    def context_from_inputs(self, inputs) 
+        phrase = inputs + [49407] * (77 - len(inputs))
+        phrase = np.array(phrase)[None].astype("int32")
+             
+        # Encode prompt tokens (and their positions) into a "context vector"
+        pos_ids = np.array(list(range(77)))[None].astype("int32")
+        return self.text_encoder.predict_on_batch([phrase, pos_ids])
     
     def tokenizer_decode(self, inputs):
         # tokens to text
