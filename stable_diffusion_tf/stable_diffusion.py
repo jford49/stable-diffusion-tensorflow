@@ -56,7 +56,7 @@ class StableDiffusion:
         context = self.text_encoder.predict_on_batch([phrase, pos_ids])
         return inputs, context
 
-    def context_from_inputs(self, inputs) 
+    def context_from_inputs(self, inputs):
         phrase = inputs + [49407] * (77 - len(inputs))
         phrase = np.array(phrase)[None].astype("int32")
              
