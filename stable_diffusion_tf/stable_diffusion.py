@@ -4,6 +4,7 @@ import math
 
 import tensorflow as tf
 from tensorflow import keras
+!pip install tf_utils
 
 from .autoencoder_kl import Decoder, Encoder
 from .diffusion_model import UNetModel
