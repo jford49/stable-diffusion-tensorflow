@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-import tensorflow_addons as tfa
 import numpy as np
 
 from .layers import quick_gelu
