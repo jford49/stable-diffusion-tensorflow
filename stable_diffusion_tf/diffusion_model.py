@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-import tensorflow_addons as tfa
 
 from .layers import PaddedConv2D, apply_seq, td_dot, GEGLU
 
@@ -9,7 +8,7 @@ class ResBlock(keras.layers.Layer):
     def __init__(self, channels, out_channels):
         super().__init__()
         self.in_layers = [
-            tfa.layers.GroupNormalization(epsilon=1e-5),
+            tf.keras.layers.GroupNormalization(epsilon=1e-5),
             keras.activations.swish,
             PaddedConv2D(out_channels, 3, padding=1),
         ]
@@ -18,7 +17,7 @@ class ResBlock(keras.layers.Layer):
             keras.layers.Dense(out_channels),
         ]
         self.out_layers = [
-            tfa.layers.GroupNormalization(epsilon=1e-5),
+            tf.keras.layers.GroupNormalization(epsilon=1e-5),
             keras.activations.swish,
             PaddedConv2D(out_channels, 3, padding=1),
         ]
@@ -96,7 +95,7 @@ class BasicTransformerBlock(keras.layers.Layer):
 class SpatialTransformer(keras.layers.Layer):
     def __init__(self, channels, n_heads, d_head):
         super().__init__()
-        self.norm = tfa.layers.GroupNormalization(epsilon=1e-5)
+        self.norm = tf.keras.layers.GroupNormalization(epsilon=1e-5)
         assert channels == n_heads * d_head
         self.proj_in = PaddedConv2D(n_heads * d_head, 1)
         self.transformer_blocks = [BasicTransformerBlock(channels, n_heads, d_head)]
@@ -185,7 +184,7 @@ class UNetModel(keras.models.Model):
             [ResBlock(640, 320), SpatialTransformer(320, 8, 40)],
         ]
         self.out = [
-            tfa.layers.GroupNormalization(epsilon=1e-5),
+            tf.keras.layers.GroupNormalization(epsilon=1e-5),
             keras.activations.swish,
             PaddedConv2D(4, kernel_size=3, padding=1),
         ]
