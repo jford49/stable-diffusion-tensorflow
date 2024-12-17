@@ -3,7 +3,7 @@ import html
 import os
 from functools import lru_cache
 
-!pip install ftfy
+pip install ftfy
 import regex as re
 
 import tensorflow as tf
